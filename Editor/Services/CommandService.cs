@@ -8,18 +8,15 @@ using SandboxModelContextProtocol.Editor.Models;
 
 namespace SandboxModelContextProtocol.Editor.Services;
 
-public sealed class CommandService
+public class CommandService
 {
-	private static readonly Lazy<CommandService> _instance = new( () => new CommandService() );
-
-	public static CommandService Instance => _instance.Value;
-
 	private readonly List<ICommandHandler> _commandHandlers;
 
 	public CommandService()
 	{
 		_commandHandlers = [
-			new ComponentCommandHandler()
+			new ComponentCommandHandler(),
+			new GameObjectCommandHandler()
 		];
 	}
 
@@ -30,7 +27,7 @@ public sealed class CommandService
 	/// <returns>The command response</returns>
 	public async Task<CommandResponse> ExecuteCommandAsync( CommandRequest request )
 	{
-		Log.Info( $"Processing command: {request.Command}" );
+		Log.Info( $"Executing command '{request.Command}' with arguments: {request.Arguments}" );
 
 		var commandHandler = _commandHandlers.FirstOrDefault( handler => handler.CanHandle( request ) );
 

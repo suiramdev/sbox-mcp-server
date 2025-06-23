@@ -14,7 +14,7 @@ namespace SandboxModelContextProtocol.Server.Services;
 public class CommandService( ILogger<CommandService> logger, IServiceProvider serviceProvider ) : ICommandService
 {
 	private readonly ILogger<CommandService> _logger = logger;
-	private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _pendingCommands = new();
+	private readonly ConcurrentDictionary<string, TaskCompletionSource<CommandResponse>> _pendingCommands = new();
 	private readonly IWebSocketService _webSocketService = serviceProvider.GetRequiredService<IWebSocketService>();
 
 	public async Task<CommandResponse> ExecuteCommandAsync( CommandRequest request )
@@ -45,7 +45,7 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 		var commandJson = JsonSerializer.Serialize( request );
 
 		// Create task completion source for this command
-		var tcs = new TaskCompletionSource<string>();
+		var tcs = new TaskCompletionSource<CommandResponse>();
 		_pendingCommands[commandId] = tcs;
 
 		try
@@ -66,12 +66,7 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 				}
 			} );
 
-			return new CommandResponse()
-			{
-				CommandId = commandId,
-				Content = await tcs.Task,
-				IsError = false
-			};
+			return await tcs.Task;
 		}
 		catch ( OperationCanceledException )
 		{
@@ -109,7 +104,7 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 
 		if ( _pendingCommands.TryRemove( response.CommandId, out var tcs ) )
 		{
-			tcs.SetResult( response.Content );
+			tcs.SetResult( response );
 			_logger.LogInformation( "Command {CommandId} completed successfully", response.CommandId );
 		}
 	}

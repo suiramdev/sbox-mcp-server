@@ -8,8 +8,9 @@ namespace SandboxModelContextProtocol.Editor.Services;
 
 public static class WebSocketService
 {
-	private static WebSocket _webSocket;
-	private static CancellationTokenSource _cancellationTokenSource;
+	private static WebSocket? _webSocket;
+	private static CancellationTokenSource? _cancellationTokenSource;
+	private static CommandService _commandService = new();
 
 	public static async Task Connect()
 	{
@@ -19,6 +20,7 @@ public static class WebSocketService
 		// Create new connection
 		_webSocket = new WebSocket();
 		_cancellationTokenSource = new CancellationTokenSource();
+		_commandService = new CommandService();
 
 		await _webSocket.Connect( "ws://localhost:8080/ws" );
 		_webSocket.OnMessageReceived += OnMessageReceived;
@@ -72,16 +74,13 @@ public static class WebSocketService
 			// Check cancellation token at the start
 			_cancellationTokenSource?.Token.ThrowIfCancellationRequested();
 
+			Log.Info( $"Received message: {message}" );
+
 			// Deserialize the command request
-			CommandRequest request = default;
-			try
+			var request = CommandRequest.FromJson( message );
+			if ( request == null )
 			{
-				request = System.Text.Json.JsonSerializer.Deserialize<CommandRequest>( message );
-				Log.Info( $"Received command request: {request.CommandId}" );
-			}
-			catch ( Exception ex )
-			{
-				Log.Error( $"Error deserializing a incoming command request: {ex.Message}" );
+				Log.Error( $"Error deserializing a incoming command request: {message}" );
 				await Send( System.Text.Json.JsonSerializer.Serialize( new CommandResponse()
 				{
 					CommandId = "error",
@@ -94,7 +93,7 @@ public static class WebSocketService
 			// Attempt to execute command
 			try
 			{
-				var response = await CommandService.Instance.ExecuteCommandAsync( request ).ConfigureAwait( false );
+				var response = await _commandService.ExecuteCommandAsync( request ).ConfigureAwait( false );
 
 				// Check cancellation before sending
 				_cancellationTokenSource?.Token.ThrowIfCancellationRequested();

@@ -106,6 +106,4 @@ public class ComponentTool( ICommandService commandService )
 
 		return response.ToCallToolResponse();
 	}
-
-	// ... (add async/await to all other methods similarly)
 }
