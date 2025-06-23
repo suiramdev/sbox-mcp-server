@@ -6,6 +6,7 @@ using SandboxModelContextProtocol.Editor.Models;
 using System;
 using System.Linq;
 using System.Text.Json;
+using Editor;
 
 namespace SandboxModelContextProtocol.Editor.Commands;
 
@@ -62,7 +63,7 @@ public class GameObjectCommandHandler : ICommandHandler
 			};
 		}
 
-		Scene? scene = Game.ActiveScene;
+		Scene? scene = SceneEditorSession.Active.Scene;
 		if ( scene == null )
 		{
 			return new CommandResponse()

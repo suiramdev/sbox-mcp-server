@@ -6,6 +6,7 @@ using SandboxModelContextProtocol.Editor.Models;
 using System;
 using System.Linq;
 using System.Text.Json;
+using Editor;
 
 namespace SandboxModelContextProtocol.Editor.Commands;
 
@@ -178,7 +179,7 @@ public class ComponentCommandHandler : ICommandHandler
 
 		if ( Guid.TryParse( gameObjectId, out var guid ) )
 		{
-			gameObject = Game.ActiveScene?.Directory.FindByGuid( guid );
+			gameObject = SceneEditorSession.Active.Scene?.Directory.FindByGuid( guid );
 		}
 
 		return gameObject;
