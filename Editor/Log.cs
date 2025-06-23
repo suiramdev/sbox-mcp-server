@@ -1,11 +1,11 @@
-namespace ModelContextProtocol;
+namespace SandboxModelContextProtocol.Editor;
 
 /// <summary>
 /// Re-implements the Log class from Sandbox to add a custom behavior.
 /// </summary>
 public static class Log
 {
-	private static Sandbox.Diagnostics.Logger _logger = new Sandbox.Diagnostics.Logger( "ModelContextProtocol" );
+	private static readonly Sandbox.Diagnostics.Logger _logger = new( "ModelContextProtocol" );
 
 	public static void Info( string message )
 	{

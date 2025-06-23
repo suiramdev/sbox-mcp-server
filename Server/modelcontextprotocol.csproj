@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-	<AssemblyName>modelcontextprotocol.server</AssemblyName>
+    <AssemblyName>SandboxModelContextProtocol.Server</AssemblyName>
     <LangVersion>13</LangVersion>
     <NoWarn>1701;1702;1591;</NoWarn>
     <WarningsAsErrors></WarningsAsErrors>
@@ -19,7 +19,7 @@
 
   <PropertyGroup>
     <OutputPath>bin\</OutputPath>
-    <RootNamespace>ModelContextProtocol.Server</RootNamespace>
+    <RootNamespace>SandboxModelContextProtocol.Server</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +28,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     <PackageReference Include="ModelContextProtocol" Version="0.2.0-preview.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

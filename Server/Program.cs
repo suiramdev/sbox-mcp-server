@@ -2,9 +2,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModelContextProtocol.Server.Services;
+using SandboxModelContextProtocol.Server.Services;
+using SandboxModelContextProtocol.Server.Services.Interfaces;
+using SandboxModelContextProtocol.Server.Models;
 
-namespace ModelContextProtocol.Server;
+namespace SandboxModelContextProtocol.Server;
 
 public class Program
 {
@@ -32,8 +34,10 @@ public class Program
 			.WithStdioServerTransport()
 			.WithToolsFromAssembly();
 
-		// Add WebSocket server configuration with IConfiguration
-		builder.Services.AddHostedService<WebSocketService>();
+		// Register WebSocket service as both hosted service and singleton for interface
+		builder.Services.AddSingleton<WebSocketService>();
+		builder.Services.AddSingleton<IWebSocketService>( provider => provider.GetRequiredService<WebSocketService>() );
+		builder.Services.AddHostedService<WebSocketService>( provider => provider.GetRequiredService<WebSocketService>() );
 
 		await builder.Build().RunAsync();
 	}

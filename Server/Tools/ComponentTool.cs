@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text.Json;
 using System.Threading.Tasks;
-using ModelContextProtocol.Server.Services;
+using ModelContextProtocol.Server;
+using ModelContextProtocol.Protocol;
+using SandboxModelContextProtocol.Server.Models;
+using SandboxModelContextProtocol.Server.Services.Interfaces;
 
-namespace ModelContextProtocol.Server.Tools;
+namespace SandboxModelContextProtocol.Server.Tools;
 
 /// <summary>
 /// Tool for managing s&box scene components via WebSocket communication
@@ -14,69 +17,94 @@ public class ComponentTool( ICommandService commandService )
 	private readonly ICommandService _commandService = commandService;
 
 	[McpServerTool, Description( "Creates a new component on a game object. Requires componentType and gameObjectId." )]
-	public async Task<string> CreateComponent( string componentType, string gameObjectId )
+	public async Task<CallToolResponse> CreateComponent( string componentType, string gameObjectId )
 	{
-		var command = JsonSerializer.Serialize( new
+		var command = new CommandRequest()
 		{
-			action = "create_component",
-			componentType,
-			gameObjectId
-		} );
+			Command = "create_component",
+			Arguments = new Dictionary<string, object>()
+			{
+				{ "componentType", componentType },
+				{ "gameObjectId", gameObjectId }
+			}
+		};
 
-		return await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync( command );
+
+		return response.ToCallToolResponse();
 	}
 
 	[McpServerTool, Description( "Gets all components attached to a game object. Requires gameObjectId." )]
-	public async Task<string> GetComponents( string gameObjectId )
+	public async Task<CallToolResponse> GetComponents( string gameObjectId )
 	{
-		var command = JsonSerializer.Serialize( new
+		var command = new CommandRequest()
 		{
-			action = "get_components",
-			gameObjectId
-		} );
+			Command = "get_components",
+			Arguments = new Dictionary<string, object>()
+			{
+				{ "gameObjectId", gameObjectId }
+			}
+		};
 
-		return await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync( command );
+
+		return response.ToCallToolResponse();
 	}
 
 	[McpServerTool, Description( "Gets a specific component by type from a game object. Requires componentType and gameObjectId." )]
-	public async Task<string> GetComponent( string componentType, string gameObjectId )
+	public async Task<CallToolResponse> GetComponent( string componentType, string gameObjectId )
 	{
-		var command = JsonSerializer.Serialize( new
+		var command = new CommandRequest()
 		{
-			action = "get_component",
-			componentType,
-			gameObjectId
-		} );
+			Command = "get_component",
+			Arguments = new Dictionary<string, object>()
+			{
+				{ "componentType", componentType },
+				{ "gameObjectId", gameObjectId }
+			}
+		};
 
-		return await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync( command );
+
+		return response.ToCallToolResponse();
 	}
 
 	[McpServerTool, Description( "Removes a component from a game object. Requires componentType and gameObjectId." )]
-	public async Task<string> RemoveComponent( string componentType, string gameObjectId )
+	public async Task<CallToolResponse> RemoveComponent( string componentType, string gameObjectId )
 	{
-		var command = JsonSerializer.Serialize( new
+		var command = new CommandRequest()
 		{
-			action = "remove_component",
-			componentType,
-			gameObjectId
-		} );
+			Command = "remove_component",
+			Arguments = new Dictionary<string, object>()
+			{
+				{ "componentType", componentType },
+				{ "gameObjectId", gameObjectId }
+			}
+		};
 
-		return await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync( command );
+
+		return response.ToCallToolResponse();
 	}
 
 	[McpServerTool, Description( "Sets a property value on a component. Requires componentType, propertyName, propertyValue, and gameObjectId." )]
-	public async Task<string> SetComponentProperty( string componentType, string propertyName, string propertyValue, string gameObjectId )
+	public async Task<CallToolResponse> SetComponentProperty( string componentType, string propertyName, string propertyValue, string gameObjectId )
 	{
-		var command = JsonSerializer.Serialize( new
+		var command = new CommandRequest()
 		{
-			action = "set_component_property",
-			componentType,
-			propertyName,
-			propertyValue,
-			gameObjectId
-		} );
+			Command = "set_component_property",
+			Arguments = new Dictionary<string, object>()
+			{
+				{ "componentType", componentType },
+				{ "propertyName", propertyName },
+				{ "propertyValue", propertyValue },
+				{ "gameObjectId", gameObjectId }
+			}
+		};
 
-		return await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync( command );
+
+		return response.ToCallToolResponse();
 	}
 
 	// ... (add async/await to all other methods similarly)

@@ -9,63 +9,29 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using SandboxModelContextProtocol.Server.Services.Interfaces;
+using SandboxModelContextProtocol.Server.Models;
 
-namespace ModelContextProtocol.Server.Services;
+namespace SandboxModelContextProtocol.Server.Services;
 
-public class WebSocketOptions
-{
-	public string Url { get; set; } = "http://localhost:8080";
-	public string Path { get; set; } = "/ws";
-}
-
-public interface IWebSocketConnection
-{
-	bool IsConnected { get; }
-	Task SendAsync( string message );
-}
-
-public class WebSocketConnection( WebSocket webSocket, ILogger logger ) : IWebSocketConnection
-{
-	private readonly WebSocket _webSocket = webSocket;
-	private readonly ILogger _logger = logger;
-
-	public bool IsConnected => _webSocket.State == WebSocketState.Open;
-
-	public async Task SendAsync( string message )
-	{
-		if ( !IsConnected )
-		{
-			_logger.LogWarning( "Attempted to send message to disconnected WebSocket" );
-			return;
-		}
-
-		try
-		{
-			var bytes = Encoding.UTF8.GetBytes( message );
-			await _webSocket.SendAsync( new ArraySegment<byte>( bytes ), WebSocketMessageType.Text, true, CancellationToken.None );
-			_logger.LogDebug( "Message sent to WebSocket: {Message}", message );
-		}
-		catch ( WebSocketException ex )
-		{
-			_logger.LogError( ex, "Failed to send WebSocket message: {Message}", message );
-			throw;
-		}
-		catch ( Exception ex )
-		{
-			_logger.LogError( ex, "Unexpected error sending WebSocket message: {Message}", message );
-			throw;
-		}
-	}
-}
-
-public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration configuration, IOptions<WebSocketOptions> options, ICommandService commandService ) : IHostedService
+public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration configuration, IOptions<Models.WebSocketOptions> options, IServiceProvider serviceProvider ) : IHostedService, IWebSocketService
 {
 	private readonly ILogger<WebSocketService> _logger = logger;
 	private readonly IConfiguration _configuration = configuration;
-	private readonly WebSocketOptions _options = options.Value;
-	private readonly ICommandService _commandService = commandService;
+	private readonly Models.WebSocketOptions _options = options.Value;
+	private readonly IServiceProvider _serviceProvider = serviceProvider;
 	private WebApplication? _app;
+	private readonly ConcurrentDictionary<WebSocketConnection, string> _connections = new();
 
+	/// <summary>
+	/// Start the WebSocket server
+	/// </summary>
+	/// <param name="cancellationToken">The cancellation token</param>
+	/// <returns>A task</returns>
 	public async Task StartAsync( CancellationToken cancellationToken )
 	{
 		var builder = WebApplication.CreateBuilder();
@@ -97,10 +63,69 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 		_logger.LogInformation( "WebSocket Server started on {WebSocketUrl}{WebSocketPath}", _options.Url, _options.Path );
 	}
 
+	/// <summary>
+	/// Get all connected WebSocket connections
+	/// </summary>
+	/// <returns>An enumerable of WebSocket connections</returns>
+	public IEnumerable<WebSocketConnection> GetWebSocketConnections()
+	{
+		return _connections.Keys;
+	}
+
+	/// <summary>
+	/// Get a connection by its ID
+	/// </summary>
+	/// <param name="connectionId">The ID of the connection</param>
+	/// <returns>The connection</returns>
+	public WebSocketConnection? GetWebSocketConnection( string connectionId )
+	{
+		return _connections.FirstOrDefault( kvp => kvp.Value == connectionId ).Key;
+	}
+
+	/// <summary>
+	/// Send a message to all connected clients
+	/// </summary>
+	/// <param name="message">The message to send</param>
+	/// <returns>A task</returns>
+	public async Task SendToAll( string message )
+	{
+		foreach ( var connection in _connections.Keys )
+		{
+			await connection.SendAsync( message );
+		}
+	}
+
+	/// <summary>
+	/// Stop the WebSocket server
+	/// </summary>
+	/// <param name="cancellationToken">The cancellation token</param>
+	/// <returns>A task</returns>
+	public async Task StopAsync( CancellationToken cancellationToken )
+	{
+		if ( _app != null )
+		{
+			await _app.StopAsync( cancellationToken );
+			_logger.LogInformation( "WebSocket Server stopped" );
+		}
+	}
+
+	private void RegisterWebSocketConnection( WebSocketConnection connection )
+	{
+		var connectionId = Guid.NewGuid().ToString();
+		_connections[connection] = connectionId;
+		_logger.LogInformation( "WebSocket connection registered with ID: {ConnectionId}", connectionId );
+	}
+
+	private void UnregisterWebSocketConnection( WebSocketConnection connection )
+	{
+		_connections.TryRemove( connection, out var connectionId );
+		_logger.LogInformation( "WebSocket connection unregistered: {ConnectionId}", connectionId );
+	}
+
 	private async Task HandleWebSocketConnection( WebSocket webSocket, CancellationToken cancellationToken )
 	{
 		var connection = new WebSocketConnection( webSocket, _logger );
-		_commandService.RegisterWebSocketConnection( connection );
+		RegisterWebSocketConnection( connection );
 
 		var buffer = new byte[1024 * 4];
 
@@ -118,7 +143,8 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 					_logger.LogInformation( "Received from s&box: {Message}", message );
 
 					// Handle responses from s&box
-					_commandService.HandleResponse( message );
+					var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+					commandService.HandleResponse( message );
 				}
 				else if ( result.MessageType == WebSocketMessageType.Close )
 				{
@@ -142,17 +168,8 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 		}
 		finally
 		{
-			_commandService.UnregisterWebSocketConnection( connection );
+			UnregisterWebSocketConnection( connection );
 			_logger.LogInformation( "WebSocket connection closed and unregistered" );
-		}
-	}
-
-	public async Task StopAsync( CancellationToken cancellationToken )
-	{
-		if ( _app != null )
-		{
-			await _app.StopAsync( cancellationToken );
-			_logger.LogInformation( "WebSocket Server stopped" );
 		}
 	}
 }
