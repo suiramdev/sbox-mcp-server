@@ -13,7 +13,7 @@ public class GameObjectCommandHandler : ICommandHandler
 {
 	private readonly HashSet<string> _supportedCommands =
 	[
-		"find_game_object_by_name",
+		"find_game_objects_by_name",
 	];
 
 	public bool CanHandle( CommandRequest request )
@@ -27,7 +27,7 @@ public class GameObjectCommandHandler : ICommandHandler
 		{
 			var response = request.Command switch
 			{
-				"find_game_object_by_name" => Task.FromResult( HandleFindGameObjectByName( request ) ),
+				"find_game_objects_by_name" => Task.FromResult( HandleFindGameObjectsByName( request ) ),
 				_ => Task.FromResult( new CommandResponse()
 				{
 					CommandId = request.CommandId,
@@ -50,7 +50,7 @@ public class GameObjectCommandHandler : ICommandHandler
 		}
 	}
 
-	private static CommandResponse HandleFindGameObjectByName( CommandRequest request )
+	private static CommandResponse HandleFindGameObjectsByName( CommandRequest request )
 	{
 		if ( !request.TryGetArgument( "name", out string? name ) || string.IsNullOrEmpty( name ) )
 		{
@@ -62,14 +62,24 @@ public class GameObjectCommandHandler : ICommandHandler
 			};
 		}
 
-		var gameObject = Game.ActiveScene?.Directory.FindByName( name, false );
-
-		if ( gameObject == null )
+		Scene? scene = Game.ActiveScene;
+		if ( scene == null )
 		{
 			return new CommandResponse()
 			{
 				CommandId = request.CommandId,
-				Content = $"GameObject with name '{name}' not found",
+				Content = "No active scene found to search for game objects",
+				IsError = true
+			};
+		}
+
+		var gameObjects = scene.Directory.FindByName( name, false );
+		if ( !gameObjects.Any() )
+		{
+			return new CommandResponse()
+			{
+				CommandId = request.CommandId,
+				Content = $"No game objects found with name '{name}'",
 				IsError = true
 			};
 		}
@@ -77,7 +87,7 @@ public class GameObjectCommandHandler : ICommandHandler
 		return new CommandResponse()
 		{
 			CommandId = request.CommandId,
-			Content = JsonSerializer.Serialize( gameObject.ToArray() ),
+			Content = JsonSerializer.Serialize( gameObjects.Select( go => go.Serialize() ).ToArray() ),
 			IsError = false
 		};
 	}

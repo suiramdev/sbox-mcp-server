@@ -16,12 +16,12 @@ public class GameObjectTool( ICommandService commandService )
 {
 	private readonly ICommandService _commandService = commandService;
 
-	[McpServerTool, Description( "Finds a game object by name. Requires name." )]
-	public async Task<CallToolResponse> FindGameObjectByName( string name )
+	[McpServerTool, Description( "Finds game objects by name. Requires name." )]
+	public async Task<CallToolResponse> FindGameObjectsByName( string name )
 	{
 		var command = new CommandRequest()
 		{
-			Command = "find_game_object_by_name",
+			Command = "find_game_objects_by_name",
 			Arguments = new Dictionary<string, object>()
 			{
 				{ "name", name }
