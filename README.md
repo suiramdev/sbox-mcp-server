@@ -5,6 +5,8 @@
 
 A Model Context Protocol (MCP) server implementation that enables AI assistants to interact with the s&box editor through real-time WebSocket communication.
 
+![](./Assets/example_1.gif)
+
 ## Architecture
 
 The system uses a two-tier architecture for seamless AI-to-editor communication:
