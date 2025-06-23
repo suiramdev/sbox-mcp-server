@@ -2,25 +2,25 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
+using ModelContextProtocol.Server.Services;
 
 namespace ModelContextProtocol.Server;
 
 public class Program
 {
-	public static async Task Main(string[] args)
+	public static async Task Main( string[] args )
 	{
-		var builder = Host.CreateApplicationBuilder(args);
+		var builder = Host.CreateApplicationBuilder( args );
 
 		// Configure logging to go to stderr for MCP protocol compliance
-		builder.Logging.AddConsole(consoleLogOptions =>
+		builder.Logging.AddConsole( consoleLogOptions =>
 		{
 			consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
-		});
+		} );
 
 		// Configure WebSocket options
 		builder.Services.Configure<WebSocketOptions>(
-			builder.Configuration.GetSection("WebSocket")
+			builder.Configuration.GetSection( "WebSocket" )
 		);
 
 		// Register the command service
@@ -33,7 +33,7 @@ public class Program
 			.WithToolsFromAssembly();
 
 		// Add WebSocket server configuration with IConfiguration
-		builder.Services.AddHostedService<WebSocketServer>();
+		builder.Services.AddHostedService<WebSocketService>();
 
 		await builder.Build().RunAsync();
 	}

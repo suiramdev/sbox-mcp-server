@@ -14,12 +14,12 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputPath>bin\</OutputPath>
     <RootNamespace>ModelContextProtocol.Server</RootNamespace>
-    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
