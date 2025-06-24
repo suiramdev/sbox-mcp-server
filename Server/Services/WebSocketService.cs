@@ -14,7 +14,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
-using SandboxModelContextProtocol.Server.Models;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services;
 

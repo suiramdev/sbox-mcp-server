@@ -4,17 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using SandboxModelContextProtocol.Editor.Commands;
 using SandboxModelContextProtocol.Editor.Commands.Interfaces;
-using SandboxModelContextProtocol.Editor.Models;
+using SandboxModelContextProtocol.Editor.Commands.Models;
 
-namespace SandboxModelContextProtocol.Editor.Services;
+namespace SandboxModelContextProtocol.Editor.Commands;
 
-public class CommandService
+public class CommandManager
 {
-	private readonly List<ICommandHandler> _commandHandlers;
+	private readonly List<ICommandHandler> _handlers;
 
-	public CommandService()
+	public CommandManager()
 	{
-		_commandHandlers = [
+		_handlers = [
 			new ComponentCommandHandler(),
 			new GameObjectCommandHandler()
 		];
@@ -25,11 +25,11 @@ public class CommandService
 	/// </summary>
 	/// <param name="request">The command request</param>
 	/// <returns>The command response</returns>
-	public async Task<CommandResponse> ExecuteCommandAsync( CommandRequest request )
+	public async Task<CommandResponse> HandleCommandAsync( CommandRequest request )
 	{
 		Log.Info( $"Executing command '{request.Command}' with arguments: {request.Arguments}" );
 
-		var commandHandler = _commandHandlers.FirstOrDefault( handler => handler.CanHandle( request ) );
+		var commandHandler = _handlers.FirstOrDefault( handler => handler.CanHandle( request ) );
 
 		if ( commandHandler == null )
 		{

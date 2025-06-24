@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SandboxModelContextProtocol.Server.Models;
+namespace SandboxModelContextProtocol.Server.Services.Models;
 
 public class CommandRequest
 {

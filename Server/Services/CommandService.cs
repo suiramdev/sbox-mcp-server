@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SandboxModelContextProtocol.Server.Models;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services;
 

@@ -2,7 +2,7 @@ using Sandbox;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SandboxModelContextProtocol.Editor.Commands.Interfaces;
-using SandboxModelContextProtocol.Editor.Models;
+using SandboxModelContextProtocol.Editor.Commands.Models;
 using System;
 using System.Linq;
 using System.Text.Json;

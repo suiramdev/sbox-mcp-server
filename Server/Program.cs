@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SandboxModelContextProtocol.Server.Services;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
-using SandboxModelContextProtocol.Server.Models;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server;
 

@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using SandboxModelContextProtocol.Server.Models;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services.Interfaces;
 

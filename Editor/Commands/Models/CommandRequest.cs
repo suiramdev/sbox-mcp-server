@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace SandboxModelContextProtocol.Editor.Models;
+namespace SandboxModelContextProtocol.Editor.Commands.Models;
 
 public record CommandRequest( string CommandId, string Command, Dictionary<string, JsonElement>? Arguments = null )
 {

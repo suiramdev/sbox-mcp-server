@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using SandboxModelContextProtocol.Editor.Models;
+using SandboxModelContextProtocol.Editor.Commands.Models;
 
 namespace SandboxModelContextProtocol.Editor.Commands.Interfaces;
 

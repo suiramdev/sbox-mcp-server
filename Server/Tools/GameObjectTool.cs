@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using ModelContextProtocol.Server;
 using ModelContextProtocol.Protocol;
-using SandboxModelContextProtocol.Server.Models;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Tools;
 

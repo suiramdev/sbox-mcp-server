@@ -1,4 +1,4 @@
-namespace SandboxModelContextProtocol.Editor.Models;
+namespace SandboxModelContextProtocol.Editor.Commands.Models;
 
 public class CommandResponse
 {

@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using ModelContextProtocol.Server;
 using ModelContextProtocol.Protocol;
-using SandboxModelContextProtocol.Server.Models;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
+using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Tools;
 
@@ -12,12 +12,12 @@ namespace SandboxModelContextProtocol.Server.Tools;
 /// Tool for managing s&box scene components via WebSocket communication
 /// </summary>
 [McpServerToolType]
-public class ComponentTool( ICommandService commandService )
+public class ComponentTool(ICommandService commandService)
 {
 	private readonly ICommandService _commandService = commandService;
 
-	[McpServerTool, Description( "Creates a new component on a game object. Requires componentType and gameObjectId." )]
-	public async Task<CallToolResponse> CreateComponent( string componentType, string gameObjectId )
+	[McpServerTool, Description("Creates a new component on a game object. Requires componentType and gameObjectId.")]
+	public async Task<CallToolResponse> CreateComponent(string componentType, string gameObjectId)
 	{
 		var command = new CommandRequest()
 		{
@@ -29,13 +29,13 @@ public class ComponentTool( ICommandService commandService )
 			}
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync(command);
 
 		return response.ToCallToolResponse();
 	}
 
-	[McpServerTool, Description( "Gets all components attached to a game object. Requires gameObjectId." )]
-	public async Task<CallToolResponse> GetComponents( string gameObjectId )
+	[McpServerTool, Description("Gets all components attached to a game object. Requires gameObjectId.")]
+	public async Task<CallToolResponse> GetComponents(string gameObjectId)
 	{
 		var command = new CommandRequest()
 		{
@@ -46,13 +46,13 @@ public class ComponentTool( ICommandService commandService )
 			}
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync(command);
 
 		return response.ToCallToolResponse();
 	}
 
-	[McpServerTool, Description( "Gets a specific component by type from a game object. Requires componentType and gameObjectId." )]
-	public async Task<CallToolResponse> GetComponent( string componentType, string gameObjectId )
+	[McpServerTool, Description("Gets a specific component by type from a game object. Requires componentType and gameObjectId.")]
+	public async Task<CallToolResponse> GetComponent(string componentType, string gameObjectId)
 	{
 		var command = new CommandRequest()
 		{
@@ -64,13 +64,13 @@ public class ComponentTool( ICommandService commandService )
 			}
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync(command);
 
 		return response.ToCallToolResponse();
 	}
 
-	[McpServerTool, Description( "Removes a component from a game object. Requires componentType and gameObjectId." )]
-	public async Task<CallToolResponse> RemoveComponent( string componentType, string gameObjectId )
+	[McpServerTool, Description("Removes a component from a game object. Requires componentType and gameObjectId.")]
+	public async Task<CallToolResponse> RemoveComponent(string componentType, string gameObjectId)
 	{
 		var command = new CommandRequest()
 		{
@@ -82,13 +82,13 @@ public class ComponentTool( ICommandService commandService )
 			}
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync(command);
 
 		return response.ToCallToolResponse();
 	}
 
-	[McpServerTool, Description( "Sets a property value on a component. Requires componentType, propertyName, propertyValue, and gameObjectId." )]
-	public async Task<CallToolResponse> SetComponentProperty( string componentType, string propertyName, string propertyValue, string gameObjectId )
+	[McpServerTool, Description("Sets a property value on a component. Requires componentType, propertyName, propertyValue, and gameObjectId.")]
+	public async Task<CallToolResponse> SetComponentProperty(string componentType, string propertyName, string propertyValue, string gameObjectId)
 	{
 		var command = new CommandRequest()
 		{
@@ -102,7 +102,7 @@ public class ComponentTool( ICommandService commandService )
 			}
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
+		var response = await _commandService.ExecuteCommandAsync(command);
 
 		return response.ToCallToolResponse();
 	}

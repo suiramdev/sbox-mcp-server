@@ -12,12 +12,12 @@
   "IsStandaloneOnly": false,
   "Metadata": {
     "Compiler": {
-      "RootNamespace": "Sandbox",
+      "RootNamespace": "SandboxModelContextProtocol",
       "DefineConstants": "SANDBOX;ADDON;DEBUG",
       "NoWarn": "1701;1702;1591;",
       "WarningsAsErrors": "",
       "TreatWarningsAsErrors": false,
-      "Nullables": false,
+      "Nullables": true,
       "ReleaseMode": "Debug",
       "AssemblyReferences": [],
       "IgnoreFolders": [],
