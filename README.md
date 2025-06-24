@@ -1,7 +1,11 @@
 # Model Context Protocol for s&box
 
+[![wip](https://img.shields.io/badge/status-WIP-red)](https://github.com/suiramdev/sbox-mcp-server/issues)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![s&box](https://img.shields.io/badge/s%26box-Compatible-orange)](https://sbox.game/)
+
+> [!IMPORTANT]
+> This project is currently under active development.
 
 A Model Context Protocol (MCP) server implementation that enables AI assistants to interact with the s&box editor through real-time WebSocket communication.
 
