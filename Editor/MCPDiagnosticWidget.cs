@@ -3,7 +3,7 @@ using Editor;
 using Sandbox;
 using SandboxModelContextProtocol.Editor.Connection;
 
-namespace SandboxModelContextProtocol.Editor.Notification;
+namespace SandboxModelContextProtocol.Editor;
 
 /// <summary>
 /// Widget for displaying individual MCP connection diagnostics

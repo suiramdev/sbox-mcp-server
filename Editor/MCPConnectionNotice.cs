@@ -4,7 +4,7 @@ using Sandbox;
 using Editor;
 using SandboxModelContextProtocol.Editor.Connection;
 
-namespace SandboxModelContextProtocol.Editor.Notification;
+namespace SandboxModelContextProtocol.Editor;
 
 internal class MCPConnectionNotice : NoticeWidget
 {
