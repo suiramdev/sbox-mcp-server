@@ -72,7 +72,7 @@ public class ComponentCommandHandler : ICommandHandler
 			return new CommandResponse()
 			{
 				CommandId = request.CommandId,
-				Content = "Argument 'componentType' is required",
+				Content = "Argument 'gameObjectId' is required",
 				IsError = true
 			};
 		}
