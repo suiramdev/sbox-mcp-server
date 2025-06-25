@@ -3,8 +3,8 @@ using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services.Interfaces;
 
-public interface ICommandService
+public interface IEditorToolService
 {
-	Task<CommandResponse> ExecuteCommandAsync( CommandRequest request );
+	Task<CallEditorToolResponse> CallTool( CallEditorToolRequest request );
 	void HandleResponse( string response );
 }

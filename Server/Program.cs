@@ -26,7 +26,7 @@ public class Program
 		);
 
 		// Register the command service
-		builder.Services.AddSingleton<ICommandService, CommandService>();
+		builder.Services.AddSingleton<IEditorToolService, EditorToolService>();
 
 		// Configure MCP Server with stdio transport and tools from assembly
 		builder.Services

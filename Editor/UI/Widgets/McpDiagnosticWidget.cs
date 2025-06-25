@@ -1,21 +1,21 @@
 using System;
 using Editor;
 using Sandbox;
-using SandboxModelContextProtocol.Editor.Connection;
+using SandboxModelContextProtocol.Editor.Connection.Models;
 
-namespace SandboxModelContextProtocol.Editor;
+namespace SandboxModelContextProtocol.Editor.UI.Widgets;
 
 /// <summary>
 /// Widget for displaying individual MCP connection diagnostics
 /// </summary>
-internal class MCPDiagnosticWidget : Widget
+internal class McpDiagnosticWidget : Widget
 {
-	private readonly MCPConnectionDiagnostic _diagnostic;
+	private readonly McpConnectionDiagnostic _diagnostic;
 
 	public string Message { get; private set; }
 	public DateTime Timestamp { get; private set; }
 
-	public MCPDiagnosticWidget( MCPConnectionDiagnostic diagnostic ) : base( null )
+	public McpDiagnosticWidget( McpConnectionDiagnostic diagnostic ) : base( null )
 	{
 		_diagnostic = diagnostic;
 		FixedHeight = 18;
@@ -40,8 +40,8 @@ internal class MCPDiagnosticWidget : Widget
 		Paint.TextAntialiasing = true;
 
 		var color = Theme.Red;
-		if ( _diagnostic.Type == MCPConnectionDiagnostic.DiagnosticType.Warning ) color = Theme.Yellow;
-		if ( _diagnostic.Type == MCPConnectionDiagnostic.DiagnosticType.Info ) color = Theme.Blue;
+		if ( _diagnostic.Type == McpConnectionDiagnostic.DiagnosticType.Warning ) color = Theme.Yellow;
+		if ( _diagnostic.Type == McpConnectionDiagnostic.DiagnosticType.Info ) color = Theme.Blue;
 
 		var rect = LocalRect;
 		var textColor = Color.Lerp( Color.White, color, 0.5f );

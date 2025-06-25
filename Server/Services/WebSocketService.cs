@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
 using SandboxModelContextProtocol.Server.Services.Models;
+using System.IO;
 
 namespace SandboxModelContextProtocol.Server.Services;
 
@@ -135,15 +136,22 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 
 			while ( webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested )
 			{
-				var result = await webSocket.ReceiveAsync( new ArraySegment<byte>( buffer ), cancellationToken );
+				using var ms = new MemoryStream();
+				WebSocketReceiveResult result;
+
+				do
+				{
+					result = await webSocket.ReceiveAsync( new ArraySegment<byte>( buffer ), cancellationToken );
+					ms.Write( buffer, 0, result.Count );
+				} while ( !result.EndOfMessage && !cancellationToken.IsCancellationRequested );
 
 				if ( result.MessageType == WebSocketMessageType.Text )
 				{
-					var message = Encoding.UTF8.GetString( buffer, 0, result.Count );
+					var message = Encoding.UTF8.GetString( ms.ToArray() );
 					_logger.LogInformation( "Received from s&box: {Message}", message );
 
 					// Handle responses from s&box
-					var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+					var commandService = _serviceProvider.GetRequiredService<IEditorToolService>();
 					commandService.HandleResponse( message );
 				}
 				else if ( result.MessageType == WebSocketMessageType.Close )

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ModelContextProtocol.Server;
-using ModelContextProtocol.Protocol;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
 using SandboxModelContextProtocol.Server.Services.Models;
 
@@ -12,24 +12,18 @@ namespace SandboxModelContextProtocol.Server.Tools;
 /// Tool for managing s&box scene components via WebSocket communication
 /// </summary>
 [McpServerToolType]
-public class GameObjectTool( ICommandService commandService )
+public class SceneTool( IEditorToolService editorToolService )
 {
-	private readonly ICommandService _commandService = commandService;
+	private readonly IEditorToolService _editorToolService = editorToolService;
 
-	[McpServerTool, Description( "Finds game objects by name. Requires name." )]
-	public async Task<CallToolResponse> FindGameObjectsByName( string name )
+	[McpServerTool, Description( "Gets the active scene." )]
+	public async Task<CallEditorToolResponse> GetActiveScene()
 	{
-		var command = new CommandRequest()
+		var command = new CallEditorToolRequest()
 		{
-			Command = "find_game_objects_by_name",
-			Arguments = new Dictionary<string, object>()
-			{
-				{ "name", name }
-			}
+			Name = nameof( GetActiveScene ),
 		};
 
-		var response = await _commandService.ExecuteCommandAsync( command );
-
-		return response.ToCallToolResponse();
+		return await _editorToolService.CallTool( command );
 	}
 }

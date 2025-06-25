@@ -1,26 +1,27 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Editor;
 using Sandbox;
-using SandboxModelContextProtocol.Editor.Commands.Models;
-using SandboxModelContextProtocol.Editor.Commands;
+using SandboxModelContextProtocol.Editor.Connection.Models;
+using SandboxModelContextProtocol.Editor.Tools;
+using SandboxModelContextProtocol.Editor.Tools.Models;
 
 namespace SandboxModelContextProtocol.Editor.Connection;
 
 /// <summary>
 /// Manages MCP WebSocket connections with status tracking and event emission
 /// </summary>
-public static class MCPConnectionManager
+public static class McpConnectionManager
 {
 	private static WebSocket? _webSocket;
 	private static CancellationTokenSource? _cancellationTokenSource;
-	private static CommandManager _commandManager = new();
 
 	/// <summary>
 	/// Current connection status and diagnostics
 	/// </summary>
-	public static MCPConnectionStatus Status { get; private set; } = new();
+	public static McpConnectionStatus Status { get; private set; } = new();
 
 	public static async Task Connect()
 	{
@@ -36,7 +37,6 @@ public static class MCPConnectionManager
 			// Create new connection
 			_webSocket = new WebSocket();
 			_cancellationTokenSource = new CancellationTokenSource();
-			_commandManager = new CommandManager();
 
 			await _webSocket.Connect( "ws://localhost:8080/ws" );
 			_webSocket.OnMessageReceived += OnMessageReceived;
@@ -59,22 +59,23 @@ public static class MCPConnectionManager
 	{
 		try
 		{
+
 			if ( _webSocket?.IsConnected == true )
 			{
 				await _webSocket.Send( message );
 			}
 			else
 			{
-				Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Warning, "Cannot send response - Not connected to MCP Server" );
+				Log.Error( "Cannot send response - Not connected to MCP Server" );
 			}
 		}
 		catch ( ObjectDisposedException )
 		{
-			Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Error, "Cannot send response - Connection to MCP Server has been disposed" );
+			Log.Error( "Cannot send response - Connection to MCP Server has been disposed" );
 		}
 		catch ( Exception ex )
 		{
-			Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Error, $"Error sending response: {ex.Message}" );
+			Log.Error( $"Error sending response: {ex.Message}" );
 		}
 	}
 
@@ -102,43 +103,25 @@ public static class MCPConnectionManager
 	private static readonly WebSocket.MessageReceivedHandler OnMessageReceived = ( message ) =>
 	{
 		// Process the command asynchronously without blocking
-		var task = Task.Run( async () =>
+		_ = Task.Run( async () =>
 		{
 			// Check cancellation token at the start
 			_cancellationTokenSource?.Token.ThrowIfCancellationRequested();
 
-			// Deserialize the command request
-			var request = CommandRequest.FromJson( message );
-			if ( request == null )
-			{
-				Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Warning, $"Error deserializing a incoming command request: {message}" );
-				await Send( System.Text.Json.JsonSerializer.Serialize( new CommandResponse()
-				{
-					CommandId = "error",
-					Content = "Invalid command request",
-					IsError = true
-				} ) );
-				return;
-			}
-
-			// Attempt to execute command
 			try
 			{
-				var response = await _commandManager.HandleCommandAsync( request ).ConfigureAwait( false );
+				CallEditorToolRequest? request = JsonSerializer.Deserialize<CallEditorToolRequest>( message );
+				if ( request == null )
+				{
+					return;
+				}
 
-				// Check cancellation before sending
-				_cancellationTokenSource?.Token.ThrowIfCancellationRequested();
-
-				// Send response back to MCP server
-				await Send( System.Text.Json.JsonSerializer.Serialize( response ) );
-			}
-			catch ( OperationCanceledException )
-			{
-				Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Info, $"Command request {request.CommandId} was cancelled" );
+				CallEditorToolResponse? response = await McpToolExecutor.CallEditorTool( request );
+				await Send( JsonSerializer.Serialize( response ) );
 			}
 			catch ( Exception ex )
 			{
-				Status.AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Error, $"Error processing command request {request.CommandId}: {ex.Message}" );
+				Log.Error( $"Error calling tool: {ex.Message}\n{ex.StackTrace}" );
 			}
 		}, _cancellationTokenSource?.Token ?? CancellationToken.None );
 	};

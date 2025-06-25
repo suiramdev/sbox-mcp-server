@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using SandboxModelContextProtocol.Editor.Connection.Models;
 
 namespace SandboxModelContextProtocol.Editor.Connection;
 
 /// <summary>
 /// Represents the status and diagnostic information for an MCP connection
 /// </summary>
-public class MCPConnectionStatus
+public class McpConnectionStatus
 {
 	public enum ConnectionState
 	{
@@ -21,7 +22,7 @@ public class MCPConnectionStatus
 	public string? DisconnectReason { get; set; }
 	public DateTime? ConnectedAt { get; set; }
 	public DateTime? LastAttemptAt { get; set; }
-	public List<MCPConnectionDiagnostic> Diagnostics { get; set; } = [];
+	public List<McpConnectionDiagnostic> Diagnostics { get; set; } = [];
 
 	public bool IsConnecting => State == ConnectionState.Connecting;
 	public bool IsConnected => State == ConnectionState.Connected;
@@ -51,7 +52,7 @@ public class MCPConnectionStatus
 		State = ConnectionState.Failed;
 		LastError = error;
 		ConnectedAt = null;
-		AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Error, error );
+		AddDiagnostic( McpConnectionDiagnostic.DiagnosticType.Error, error );
 	}
 
 	public void SetDisconnected( string reason )
@@ -59,12 +60,12 @@ public class MCPConnectionStatus
 		State = ConnectionState.Disconnected;
 		DisconnectReason = reason;
 		ConnectedAt = null;
-		AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType.Warning, $"Disconnected: {reason}" );
+		AddDiagnostic( McpConnectionDiagnostic.DiagnosticType.Warning, $"Disconnected: {reason}" );
 	}
 
-	public void AddDiagnostic( MCPConnectionDiagnostic.DiagnosticType type, string message )
+	public void AddDiagnostic( McpConnectionDiagnostic.DiagnosticType type, string message )
 	{
-		Diagnostics.Add( new MCPConnectionDiagnostic
+		Diagnostics.Add( new McpConnectionDiagnostic
 		{
 			Type = type,
 			Message = message,

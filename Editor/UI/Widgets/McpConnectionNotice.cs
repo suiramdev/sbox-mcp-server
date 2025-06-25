@@ -3,14 +3,15 @@ using System.Linq;
 using Sandbox;
 using Editor;
 using SandboxModelContextProtocol.Editor.Connection;
+using SandboxModelContextProtocol.Editor.Connection.Models;
 
-namespace SandboxModelContextProtocol.Editor;
+namespace SandboxModelContextProtocol.Editor.UI.Widgets;
 
-internal class MCPConnectionNotice : NoticeWidget
+internal class McpConnectionNotice : NoticeWidget
 {
-	private MCPConnectionStatus _connectionStatus;
+	private McpConnectionStatus _connectionStatus;
 
-	public MCPConnectionNotice( MCPConnectionStatus connectionStatus )
+	public McpConnectionNotice( McpConnectionStatus connectionStatus )
 	{
 		Icon = "link";
 		Position = 15;
@@ -65,20 +66,20 @@ internal class MCPConnectionNotice : NoticeWidget
 			return;
 
 		var diagnosticCount = _connectionStatus.Diagnostics?.Count ?? 0;
-		var errorCount = _connectionStatus.Diagnostics?.Count( x => x.Type == MCPConnectionDiagnostic.DiagnosticType.Error ) ?? 0;
-		var warningCount = _connectionStatus.Diagnostics?.Count( x => x.Type == MCPConnectionDiagnostic.DiagnosticType.Warning ) ?? 0;
+		var errorCount = _connectionStatus.Diagnostics?.Count( x => x.Type == McpConnectionDiagnostic.DiagnosticType.Error ) ?? 0;
+		var warningCount = _connectionStatus.Diagnostics?.Count( x => x.Type == McpConnectionDiagnostic.DiagnosticType.Warning ) ?? 0;
 
 		// Update based on connection state
 		switch ( _connectionStatus.State )
 		{
-			case MCPConnectionStatus.ConnectionState.Connecting:
+			case McpConnectionStatus.ConnectionState.Connecting:
 				IsRunning = true;
 				Subtitle = "Connecting to MCP server...";
 				BorderColor = Theme.Primary;
 				isErrored = false;
 				break;
 
-			case MCPConnectionStatus.ConnectionState.Connected:
+			case McpConnectionStatus.ConnectionState.Connected:
 				IsRunning = false;
 				isErrored = false;
 				BorderColor = Theme.Green;
@@ -89,7 +90,7 @@ internal class MCPConnectionNotice : NoticeWidget
 					EditorUtility.PlayRawSound( "sounds/editor/success.wav" );
 				break;
 
-			case MCPConnectionStatus.ConnectionState.Failed:
+			case McpConnectionStatus.ConnectionState.Failed:
 				IsRunning = false;
 				isErrored = true;
 				BorderColor = Theme.Red;
@@ -101,7 +102,7 @@ internal class MCPConnectionNotice : NoticeWidget
 					EditorUtility.PlayRawSound( "sounds/editor/fail.wav" );
 				break;
 
-			case MCPConnectionStatus.ConnectionState.Disconnected:
+			case McpConnectionStatus.ConnectionState.Disconnected:
 				IsRunning = false;
 				isErrored = false;
 				BorderColor = Theme.Yellow;
@@ -141,7 +142,7 @@ internal class MCPConnectionNotice : NoticeWidget
 
 		foreach ( var diag in diagnostics )
 		{
-			bodyWidget.Layout.Add( new MCPDiagnosticWidget( diag ) );
+			bodyWidget.Layout.Add( new McpDiagnosticWidget( diag ) );
 		}
 
 		SetBodyWidget( bodyWidget );
@@ -151,20 +152,20 @@ internal class MCPConnectionNotice : NoticeWidget
 	public static void OnConnectionStarted()
 	{
 		// Find an old notice to replace or create a new one
-		var notice = NoticeManager.All.OfType<MCPConnectionNotice>().FirstOrDefault();
-		if ( !notice.IsValid() ) notice = new MCPConnectionNotice( MCPConnectionManager.Status );
+		var notice = NoticeManager.All.OfType<McpConnectionNotice>().FirstOrDefault();
+		if ( !notice.IsValid() ) notice = new McpConnectionNotice( McpConnectionManager.Status );
 
-		notice._connectionStatus = MCPConnectionManager.Status;
+		notice._connectionStatus = McpConnectionManager.Status;
 		notice.Reset();
 	}
 
 	[Event( "mcp.connection.success" )]
 	public static void OnConnectionSuccess()
 	{
-		var notice = NoticeManager.All.OfType<MCPConnectionNotice>().FirstOrDefault();
+		var notice = NoticeManager.All.OfType<McpConnectionNotice>().FirstOrDefault();
 		if ( notice.IsValid() )
 		{
-			notice._connectionStatus = MCPConnectionManager.Status;
+			notice._connectionStatus = McpConnectionManager.Status;
 			notice.Tick();
 		}
 	}
@@ -172,10 +173,10 @@ internal class MCPConnectionNotice : NoticeWidget
 	[Event( "mcp.connection.failed" )]
 	public static void OnConnectionFailed()
 	{
-		var notice = NoticeManager.All.OfType<MCPConnectionNotice>().FirstOrDefault();
+		var notice = NoticeManager.All.OfType<McpConnectionNotice>().FirstOrDefault();
 		if ( notice.IsValid() )
 		{
-			notice._connectionStatus = MCPConnectionManager.Status;
+			notice._connectionStatus = McpConnectionManager.Status;
 			notice.Tick();
 		}
 	}
@@ -183,10 +184,10 @@ internal class MCPConnectionNotice : NoticeWidget
 	[Event( "mcp.disconnected" )]
 	public static void OnDisconnected()
 	{
-		var notice = NoticeManager.All.OfType<MCPConnectionNotice>().FirstOrDefault();
+		var notice = NoticeManager.All.OfType<McpConnectionNotice>().FirstOrDefault();
 		if ( notice.IsValid() )
 		{
-			notice._connectionStatus = MCPConnectionManager.Status;
+			notice._connectionStatus = McpConnectionManager.Status;
 			notice.Tick();
 		}
 	}

@@ -11,18 +11,18 @@ using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services;
 
-public class CommandService( ILogger<CommandService> logger, IServiceProvider serviceProvider ) : ICommandService
+public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvider serviceProvider ) : IEditorToolService
 {
-	private readonly ILogger<CommandService> _logger = logger;
-	private readonly ConcurrentDictionary<string, TaskCompletionSource<CommandResponse>> _pendingCommands = new();
+	private readonly ILogger<EditorToolService> _logger = logger;
+	private readonly ConcurrentDictionary<string, TaskCompletionSource<CallEditorToolResponse>> _pendingCommands = new();
 	private readonly IWebSocketService _webSocketService = serviceProvider.GetRequiredService<IWebSocketService>();
 
-	public async Task<CommandResponse> ExecuteCommandAsync( CommandRequest request )
+	public async Task<CallEditorToolResponse> CallTool( CallEditorToolRequest request )
 	{
 		// Generate unique command ID
-		var commandId = Guid.NewGuid().ToString();
+		var id = Guid.NewGuid().ToString();
 
-		_logger.LogInformation( "Executing command: {Command}", request.Command );
+		_logger.LogInformation( "Executing tool call: {Name}", request.Name );
 
 		// Find active connections
 		var activeConnections = _webSocketService.GetWebSocketConnections()
@@ -32,28 +32,29 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 		// If no active connections, return an error
 		if ( activeConnections.Count == 0 )
 		{
-			return new CommandResponse()
+			return new CallEditorToolResponse()
 			{
-				CommandId = commandId,
-				Content = "No active s&box connections available",
+				Id = id,
+				Name = request.Name,
+				Content = [JsonSerializer.SerializeToElement( "No active s&box connections available" )],
 				IsError = true
 			};
 		}
 
 		// Add command ID to request
-		request.CommandId = commandId;
+		request.Id = id;
 		var commandJson = JsonSerializer.Serialize( request );
 
 		// Create task completion source for this command
-		var tcs = new TaskCompletionSource<CommandResponse>();
-		_pendingCommands[commandId] = tcs;
+		var tcs = new TaskCompletionSource<CallEditorToolResponse>();
+		_pendingCommands[id] = tcs;
 
 		try
 		{
 			// Send command to all active s&box connections
 			await _webSocketService.SendToAll( commandJson );
 
-			_logger.LogInformation( "Command sent to s&box connections" );
+			_logger.LogInformation( "Tool call sent to s&box connections" );
 
 			// Wait for response with timeout
 			using var cts = new CancellationTokenSource( TimeSpan.FromSeconds( 30 ) );
@@ -61,8 +62,8 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 			{
 				if ( tcs.TrySetCanceled() )
 				{
-					_pendingCommands.TryRemove( commandId, out _ );
-					_logger.LogWarning( "Command {CommandId} timed out", commandId );
+					_pendingCommands.TryRemove( id, out _ );
+					_logger.LogWarning( "Tool call {Id} timed out", id );
 				}
 			} );
 
@@ -70,22 +71,24 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 		}
 		catch ( OperationCanceledException )
 		{
-			_pendingCommands.TryRemove( commandId, out _ );
-			return new CommandResponse()
+			_pendingCommands.TryRemove( id, out _ );
+			return new CallEditorToolResponse()
 			{
-				CommandId = commandId,
-				Content = "Command timed out after 30 seconds",
+				Id = id,
+				Name = request.Name,
+				Content = [JsonSerializer.SerializeToElement( "Tool call timed out after 30 seconds" )],
 				IsError = true
 			};
 		}
 		catch ( Exception ex )
 		{
-			_pendingCommands.TryRemove( commandId, out _ );
-			_logger.LogError( ex, "Failed to send command to s&box connections" );
-			return new CommandResponse()
+			_pendingCommands.TryRemove( id, out _ );
+			_logger.LogError( ex, "Failed to send tool call to s&box connections" );
+			return new CallEditorToolResponse()
 			{
-				CommandId = commandId,
-				Content = $"Failed to send command: {ex.Message}",
+				Id = id,
+				Name = request.Name,
+				Content = [JsonSerializer.SerializeToElement( $"Failed to send tool call: {ex.Message}" )],
 				IsError = true
 			};
 		}
@@ -95,17 +98,17 @@ public class CommandService( ILogger<CommandService> logger, IServiceProvider se
 	{
 		_logger.LogInformation( "Handling response: {Message}", message );
 
-		CommandResponse? response = JsonSerializer.Deserialize<CommandResponse>( message );
+		CallEditorToolResponse? response = JsonSerializer.Deserialize<CallEditorToolResponse>( message );
 		if ( response == null )
 		{
 			_logger.LogWarning( "Failed to parse response JSON: {Message}", message );
 			return;
 		}
 
-		if ( _pendingCommands.TryRemove( response.CommandId, out var tcs ) )
+		if ( _pendingCommands.TryRemove( response.Id, out var tcs ) )
 		{
 			tcs.SetResult( response );
-			_logger.LogInformation( "Command {CommandId} completed successfully", response.CommandId );
+			_logger.LogInformation( "Tool call {Id} completed successfully", response.Id );
 		}
 	}
 }
