@@ -1,6 +1,7 @@
 using System;
 using System.Net.WebSockets;
 using System.Text;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -127,32 +128,39 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 		var connection = new WebSocketConnection( webSocket, _logger );
 		RegisterWebSocketConnection( connection );
 
-		var buffer = new byte[1024 * 4];
+                var buffer = new byte[1024 * 4];
 
-		try
-		{
-			_logger.LogInformation( "WebSocket connection established" );
+                try
+                {
+                        _logger.LogInformation( "WebSocket connection established" );
 
-			while ( webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested )
-			{
-				var result = await webSocket.ReceiveAsync( new ArraySegment<byte>( buffer ), cancellationToken );
+                        while ( webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested )
+                        {
+                                using var ms = new MemoryStream();
+                                WebSocketReceiveResult result;
 
-				if ( result.MessageType == WebSocketMessageType.Text )
-				{
-					var message = Encoding.UTF8.GetString( buffer, 0, result.Count );
-					_logger.LogInformation( "Received from s&box: {Message}", message );
+                                do
+                                {
+                                        result = await webSocket.ReceiveAsync( new ArraySegment<byte>( buffer ), cancellationToken );
+                                        ms.Write( buffer, 0, result.Count );
+                                } while ( !result.EndOfMessage && !cancellationToken.IsCancellationRequested );
 
-					// Handle responses from s&box
-					var commandService = _serviceProvider.GetRequiredService<ICommandService>();
-					commandService.HandleResponse( message );
-				}
-				else if ( result.MessageType == WebSocketMessageType.Close )
-				{
-					_logger.LogInformation( "WebSocket close message received from client" );
-					await webSocket.CloseAsync( WebSocketCloseStatus.NormalClosure, "Connection closed by client", cancellationToken );
-					break;
-				}
-			}
+                                if ( result.MessageType == WebSocketMessageType.Text )
+                                {
+                                        var message = Encoding.UTF8.GetString( ms.ToArray() );
+                                        _logger.LogInformation( "Received from s&box: {Message}", message );
+
+                                        // Handle responses from s&box
+                                        var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+                                        commandService.HandleResponse( message );
+                                }
+                                else if ( result.MessageType == WebSocketMessageType.Close )
+                                {
+                                        _logger.LogInformation( "WebSocket close message received from client" );
+                                        await webSocket.CloseAsync( WebSocketCloseStatus.NormalClosure, "Connection closed by client", cancellationToken );
+                                        break;
+                                }
+                        }
 		}
 		catch ( OperationCanceledException )
 		{
