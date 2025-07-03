@@ -8,15 +8,12 @@ using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Tools;
 
-/// <summary>
-/// Tool for managing s&box scene components via WebSocket communication
-/// </summary>
-[McpServerToolType, Description( "Editor scene tools" )]
+[McpServerToolType]
 public class EditorSceneTool( IEditorToolService editorToolService )
 {
 	private readonly IEditorToolService _editorToolService = editorToolService;
 
-	[McpServerTool, Description( "Gets the active editor scene." )]
+	[McpServerTool, Description( "Gets the scene in the active editor session." )]
 	public async Task<CallEditorToolResponse> GetActiveEditorScene()
 	{
 		var command = new CallEditorToolRequest()
@@ -27,7 +24,7 @@ public class EditorSceneTool( IEditorToolService editorToolService )
 		return await _editorToolService.CallTool( command );
 	}
 
-	[McpServerTool, Description( "Loads a scene from a path." )]
+	[McpServerTool, Description( "Loads a scene in a new editor session from a path." )]
 	public async Task<CallEditorToolResponse> LoadEditorSceneFromPath( string path )
 	{
 		var command = new CallEditorToolRequest()
@@ -37,28 +34,6 @@ public class EditorSceneTool( IEditorToolService editorToolService )
 			{
 				{ "path", JsonSerializer.SerializeToElement( path ) },
 			},
-		};
-
-		return await _editorToolService.CallTool( command );
-	}
-
-	[McpServerTool, Description( "Saves all editor sessions." )]
-	public async Task<CallEditorToolResponse> SaveAllEditorSessions()
-	{
-		var command = new CallEditorToolRequest()
-		{
-			Name = nameof( SaveAllEditorSessions ),
-		};
-
-		return await _editorToolService.CallTool( command );
-	}
-
-	[McpServerTool, Description( "Saves the active editor session." )]
-	public async Task<CallEditorToolResponse> SaveEditorSession()
-	{
-		var command = new CallEditorToolRequest()
-		{
-			Name = nameof( SaveEditorSession ),
 		};
 
 		return await _editorToolService.CallTool( command );
