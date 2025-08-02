@@ -11,17 +11,14 @@ using SandboxModelContextProtocol.Server.Services.Models;
 
 namespace SandboxModelContextProtocol.Server.Services;
 
-public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvider serviceProvider ) : IEditorToolService
+public class ToolService( ILogger<ToolService> logger, IServiceProvider serviceProvider ) : IToolService
 {
-	private readonly ILogger<EditorToolService> _logger = logger;
-	private readonly ConcurrentDictionary<string, TaskCompletionSource<CallEditorToolResponse>> _pendingCommands = new();
+	private readonly ILogger<ToolService> _logger = logger;
+	private readonly ConcurrentDictionary<string, TaskCompletionSource<CallToolResponse>> _pendingCommands = new();
 	private readonly IWebSocketService _webSocketService = serviceProvider.GetRequiredService<IWebSocketService>();
 
-	public async Task<CallEditorToolResponse> CallTool( CallEditorToolRequest request )
+	public async Task<CallToolResponse> CallTool( CallToolRequest request )
 	{
-		// Generate unique command ID
-		var id = Guid.NewGuid().ToString();
-
 		_logger.LogInformation( "Executing tool call: {Name}", request.Name );
 
 		// Find active connections
@@ -32,27 +29,25 @@ public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvi
 		// If no active connections, return an error
 		if ( activeConnections.Count == 0 )
 		{
-			return new CallEditorToolResponse()
+			return new CallToolResponse()
 			{
-				Id = id,
+				Id = request.Id,
 				Name = request.Name,
 				Content = [JsonSerializer.SerializeToElement( "No active s&box connections available" )],
 				IsError = true
 			};
 		}
 
-		// Add command ID to request
-		request.Id = id;
-		var commandJson = JsonSerializer.Serialize( request );
+		var requestJson = JsonSerializer.Serialize( request );
 
 		// Create task completion source for this command
-		var tcs = new TaskCompletionSource<CallEditorToolResponse>();
-		_pendingCommands[id] = tcs;
+		var tcs = new TaskCompletionSource<CallToolResponse>();
+		_pendingCommands[request.Id] = tcs;
 
 		try
 		{
 			// Send command to all active s&box connections
-			await _webSocketService.SendToAll( commandJson );
+			await _webSocketService.SendToAll( requestJson );
 
 			_logger.LogInformation( "Tool call sent to s&box connections" );
 
@@ -62,8 +57,8 @@ public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvi
 			{
 				if ( tcs.TrySetCanceled() )
 				{
-					_pendingCommands.TryRemove( id, out _ );
-					_logger.LogWarning( "Tool call {Id} timed out", id );
+					_pendingCommands.TryRemove( request.Id, out _ );
+					_logger.LogWarning( "Tool call {Id} timed out", request.Id );
 				}
 			} );
 
@@ -71,10 +66,10 @@ public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvi
 		}
 		catch ( OperationCanceledException )
 		{
-			_pendingCommands.TryRemove( id, out _ );
-			return new CallEditorToolResponse()
+			_pendingCommands.TryRemove( request.Id, out _ );
+			return new CallToolResponse()
 			{
-				Id = id,
+				Id = request.Id,
 				Name = request.Name,
 				Content = [JsonSerializer.SerializeToElement( "Tool call timed out after 30 seconds" )],
 				IsError = true
@@ -82,11 +77,11 @@ public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvi
 		}
 		catch ( Exception ex )
 		{
-			_pendingCommands.TryRemove( id, out _ );
+			_pendingCommands.TryRemove( request.Id, out _ );
 			_logger.LogError( ex, "Failed to send tool call to s&box connections" );
-			return new CallEditorToolResponse()
+			return new CallToolResponse()
 			{
-				Id = id,
+				Id = request.Id,
 				Name = request.Name,
 				Content = [JsonSerializer.SerializeToElement( $"Failed to send tool call: {ex.Message}" )],
 				IsError = true
@@ -98,7 +93,7 @@ public class EditorToolService( ILogger<EditorToolService> logger, IServiceProvi
 	{
 		_logger.LogInformation( "Handling response: {Message}", message );
 
-		CallEditorToolResponse? response = JsonSerializer.Deserialize<CallEditorToolResponse>( message );
+		CallToolResponse? response = JsonSerializer.Deserialize<CallToolResponse>( message );
 		if ( response == null )
 		{
 			_logger.LogWarning( "Failed to parse response JSON: {Message}", message );
