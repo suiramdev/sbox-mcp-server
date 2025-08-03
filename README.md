@@ -3,8 +3,6 @@
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![s&box](https://img.shields.io/badge/s%26box-Compatible-orange)](https://sbox.game/)
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtcCUyMDgwODAlM0E4MDgwJTIwZ2hjci5pbyUyRnN1aXJhbWRldiUyRnNib3gtbWNwLXNlcnZlciUzQWxhdGVzdCUyMiUyQyUyMnR5cGUlMjIlM0ElMjJodHRwJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMnVybCUyMiUzQSUyMmh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E4MDgwJTIyJTdE)
-
 > [!IMPORTANT]
 > This project is currently under active development.
 
@@ -16,7 +14,7 @@ This MCP server works in conjunction with the separate [s&box Adapter Library](h
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/get-started) (recommended)
+- [Docker](https://www.docker.com/get-started) (recommended) or [.NET SDK](https://dotnet.microsoft.com/download) (for manual installation)
 - [s&box](https://sbox.game/)
 - An [AI assistant that supports MCP](https://docs.cursor.com/mcp/introduction) (for example, Cursor, Claude Desktop, etc.) is suggested
 
@@ -26,42 +24,17 @@ This MCP server works in conjunction with the separate [s&box Adapter Library](h
 
 To get started, make sure you have Docker installed on your system. Cursor users can simply click the button below to install and launch the MCP Server automatically, or you can follow the manual instructions below.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtcCUyMDgwODAlM0E4MDgwJTIwZ2hjci5pbyUyRnN1aXJhbWRldiUyRnNib3gtbWNwLXNlcnZlciUzQWxhdGVzdCUyMiUyQyUyMnR5cGUlMjIlM0ElMjJodHRwJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMnVybCUyMiUzQSUyMmh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E4MDgwJTIyJTdE)
 
-<details>
-<summary style="color: lightgray;">Manual Installation using Docker</summary>
+1. **Run the container**
 
-<br />
-
-1. **Build the Docker image**
     ```bash
-        docker build -t sbox-mcp-server .
-    ```
-2. **Run the container**
-    ```bash
-        docker run -d -p 8080:8080 --name sbox-mcp-server sbox-mcp-server
-    ```
-3. **Use the MCP Server in your AI assistant**
-    ```json
-    {
-      "mcpServers": {
-        "sbox": {
-          "command": "docker",
-          "args": [
-            "run",
-            "--rm",
-            "-i",
-            "--name", "sbox-mcp-server-cursor",
-            "--force-rm",
-            "-p", "8080:8080",
-            "sbox-mcp-server"
-          ]
-        }
-      }
-    }
+    docker run -d -p 8080:8080 --name sbox-mcp-server ghcr.io/suiramdev/sbox-mcp-server:latest
     ```
 
-</details>
+2. **Connect your AI assistant to the running MCP Server**
+
+    [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox-mcp-server&config=JTdCJTIydHlwZSUyMiUzQSUyMmh0dHAlMjIlMkMlMjJ1cmwlMjIlM0ElMjJodHRwJTNBJTJGJTJGbG9jYWxob3N0JTNBODA4MCUyMiU3RA%3D%3D)
+
 
 <details>
 <summary style="color: lightgray;">Manual Installation using .NET SDK</summary>
@@ -69,24 +42,20 @@ To get started, make sure you have Docker installed on your system. Cursor users
 <br />
 
 1. **Build the server**
+
     ```bash
         dotnet build
     ```
-2. **Run the container**
+
+2. **Run the server**
+
     ```bash
         dotnet run
     ```
-3. **Use the MCP Server in your AI assistant**
-    ```json
-    {
-      "mcpServers": {
-        "sbox": {
-          "transport": "http",
-          "url": "http://localhost:8080"
-        }
-      }
-    }
-    ```
+
+3. **Connect your AI assistant to the running MCP Server**
+
+    [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox-mcp-server&config=JTdCJTIydHlwZSUyMiUzQSUyMmh0dHAlMjIlMkMlMjJ1cmwlMjIlM0ElMjJodHRwJTNBJTJGJTJGbG9jYWxob3N0JTNBODA4MCUyMiU3RA%3D%3D)
 
 </details>
 
