@@ -5,8 +5,11 @@ using System.Text.Json.Serialization;
 
 namespace SandboxModelContextProtocol.Server.Services.Models;
 
-public class CallEditorToolRequest
+public class CallToolRequest
 {
+	[JsonPropertyName( "type" )]
+	public string Type { get; } = "tool";
+
 	[JsonPropertyName( "id" )]
 	public string Id { get; set; } = Guid.NewGuid().ToString();
 

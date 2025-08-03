@@ -9,14 +9,14 @@ using SandboxModelContextProtocol.Server.Services.Models;
 namespace SandboxModelContextProtocol.Server.Tools;
 
 [McpServerToolType]
-public class EditorSceneTool( IEditorToolService editorToolService )
+public class EditorSceneTool( IToolService editorToolService )
 {
-	private readonly IEditorToolService _editorToolService = editorToolService;
+	private readonly IToolService _editorToolService = editorToolService;
 
 	[McpServerTool, Description( "Gets the scene in the active editor session." )]
-	public async Task<CallEditorToolResponse> GetActiveEditorScene()
+	public async Task<CallToolResponse> GetActiveEditorScene()
 	{
-		var command = new CallEditorToolRequest()
+		var command = new CallToolRequest()
 		{
 			Name = nameof( GetActiveEditorScene ),
 		};
@@ -25,9 +25,9 @@ public class EditorSceneTool( IEditorToolService editorToolService )
 	}
 
 	[McpServerTool, Description( "Loads a scene in a new editor session from a path." )]
-	public async Task<CallEditorToolResponse> LoadEditorSceneFromPath( string path )
+	public async Task<CallToolResponse> LoadEditorSceneFromPath( string path )
 	{
-		var command = new CallEditorToolRequest()
+		var command = new CallToolRequest()
 		{
 			Name = nameof( LoadEditorSceneFromPath ),
 			Arguments = new Dictionary<string, JsonElement>()

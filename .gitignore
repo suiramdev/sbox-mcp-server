@@ -5,7 +5,6 @@
 # Auto-generated code editor files
 .vs/*
 .vscode/*
-*.csproj
 obj
 bin
 Properties/*
