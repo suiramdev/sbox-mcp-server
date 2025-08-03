@@ -3,7 +3,7 @@
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![s&box](https://img.shields.io/badge/s%26box-Compatible-orange)](https://sbox.game/)
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtLWZvcmNlLXJtJTIwLXAlMjA4MDgwJTNBODA4MCUyMGdoY3IuaW8lMkZzdWlyYW1kZXYlMkZzYm94LW1jcC1zZXJ2ZXIlM0FtYWluJTIyJTJDJTIydHlwZSUyMiUzQSUyMnN0ZGlvJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMmVudiUyMiUzQSU3QiUyMkRPQ0tFUl9CVUlMREtJVCUyMiUzQSUyMjElMjIlN0QlN0Q%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtcCUyMDgwODAlM0E4MDgwJTIwZ2hjci5pbyUyRnN1aXJhbWRldiUyRnNib3gtbWNwLXNlcnZlciUzQWxhdGVzdCUyMiUyQyUyMnR5cGUlMjIlM0ElMjJodHRwJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMnVybCUyMiUzQSUyMmh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E4MDgwJTIyJTdE)
 
 > [!IMPORTANT]
 > This project is currently under active development.
@@ -26,7 +26,7 @@ This MCP server works in conjunction with the separate [s&box Adapter Library](h
 
 To get started, make sure you have Docker installed on your system. Cursor users can simply click the button below to install and launch the MCP Server automatically, or you can follow the manual instructions below.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtLWZvcmNlLXJtJTIwLXAlMjA4MDgwJTNBODA4MCUyMGdoY3IuaW8lMkZzdWlyYW1kZXYlMkZzYm94LW1jcC1zZXJ2ZXIlM0FtYWluJTIyJTJDJTIydHlwZSUyMiUzQSUyMnN0ZGlvJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMmVudiUyMiUzQSU3QiUyMkRPQ0tFUl9CVUlMREtJVCUyMiUzQSUyMjElMjIlN0QlN0Q%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMmRvY2tlciUyMHJ1biUyMC0tcm0lMjAtaSUyMC0tbmFtZSUyMHNib3gtbWNwLXNlcnZlci1jdXJzb3IlMjAtcCUyMDgwODAlM0E4MDgwJTIwZ2hjci5pbyUyRnN1aXJhbWRldiUyRnNib3gtbWNwLXNlcnZlciUzQWxhdGVzdCUyMiUyQyUyMnR5cGUlMjIlM0ElMjJodHRwJTIyJTJDJTIyZW5hYmxlJTIyJTNBdHJ1ZSUyQyUyMnVybCUyMiUzQSUyMmh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E4MDgwJTIyJTdE)
 
 <details>
 <summary style="color: lightgray;">Manual Installation using Docker</summary>
