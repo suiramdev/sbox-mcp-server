@@ -30,6 +30,7 @@ jobs:
       contents: read
       packages: write
       id-token: write  # Required for OIDC token generation
+      attestations: write  # Required to create attestations
 
     steps:
       - name: Checkout repository
