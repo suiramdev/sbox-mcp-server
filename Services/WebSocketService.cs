@@ -61,7 +61,7 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 		} );
 
 		await _app.StartAsync( cancellationToken );
-		_logger.LogInformation( "WebSocket Server started on {WebSocketUrl}{WebSocketPath}", _options.Url, _options.Path );
+		_logger.LogInformation( "WebSocket Server started on {WebSocketPath}", _options.Path );
 	}
 
 	/// <summary>
@@ -123,7 +123,7 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 		_logger.LogInformation( "WebSocket connection unregistered: {ConnectionId}", connectionId );
 	}
 
-	private async Task HandleWebSocketConnection( WebSocket webSocket, CancellationToken cancellationToken )
+	public async Task HandleWebSocketConnection( WebSocket webSocket, CancellationToken cancellationToken )
 	{
 		var connection = new WebSocketConnection( webSocket, _logger );
 		RegisterWebSocketConnection( connection );
@@ -151,7 +151,7 @@ public class WebSocketService( ILogger<WebSocketService> logger, IConfiguration 
 					_logger.LogInformation( "Received from s&box: {Message}", message );
 
 					// Handle responses from s&box
-					var commandService = _serviceProvider.GetRequiredService<IEditorToolService>();
+					var commandService = _serviceProvider.GetRequiredService<IToolService>();
 					commandService.HandleResponse( message );
 				}
 				else if ( result.MessageType == WebSocketMessageType.Close )

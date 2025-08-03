@@ -14,73 +14,63 @@ This MCP server works in conjunction with the separate [s&box Adapter Library](h
 
 ## Prerequisites
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later
-- [s&box](https://sbox.game/) (latest version)
-- [s&box Adapter Library](https://github.com/suiramdev/sbox-mcp-library) (must be installed separately)
-- An MCP-compatible AI assistant (Claude Desktop, Cursor, etc.)
+- [Docker](https://www.docker.com/get-started) (recommended) or [.NET SDK](https://dotnet.microsoft.com/download) (for manual installation)
+- [s&box](https://sbox.game/)
+- An [AI assistant that supports MCP](https://docs.cursor.com/mcp/introduction) (for example, Cursor, Claude Desktop, etc.) is suggested
 
 ## Quick Start
 
 ### Step 1: Install and Run the MCP Server
 
-1. **Clone this repository**
+To get started, make sure you have Docker installed on your system. Cursor users can simply click the button below to install and launch the MCP Server automatically, or you can follow the manual instructions below.
+
+
+1. **Run the container**
 
     ```bash
-    git clone https://github.com/suiramdev/sbox-mcp-server.git
-    cd sbox-mcp-server
+    docker run -d -p 8080:8080 --name sbox-mcp-server ghcr.io/suiramdev/sbox-mcp-server:latest
     ```
 
-2. **Build the server**
+2. **Connect your AI assistant to the running MCP Server**
 
-    **Using the Build Script (Recommended):**
+    [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox-mcp-server&config=JTdCJTIydHlwZSUyMiUzQSUyMmh0dHAlMjIlMkMlMjJ1cmwlMjIlM0ElMjJodHRwJTNBJTJGJTJGbG9jYWxob3N0JTNBODA4MCUyMiU3RA%3D%3D)
 
-    ```powershell
-    .\build.ps1
-    ```
 
-    **Manual Build:**
+<details>
+<summary style="color: lightgray;">Manual Installation using .NET SDK</summary>
+
+<br />
+
+1. **Build the server**
 
     ```bash
-    dotnet build
+        dotnet build
     ```
 
-3. **Configure your AI assistant**
+2. **Run the server**
 
-    Add the MCP server to your AI assistant configuration:
-
-    **For Cursor Editor (mcp.json):**
-
-    ```json
-    {
-      "mcpServers": {
-        "sbox": {
-          "command": "cmd",
-          "type": "stdio",
-          "enable": true,
-          "args": [
-            "/c", 
-            "<project-root>\\bin\\win-x64\\SandboxModelContextProtocol.Server.exe"
-          ]
-        }
-      }
-    }
+    ```bash
+        dotnet run
     ```
 
-> [!IMPORTANT]
-> The server must be running for the s&box adapter library to function. Please ensure the server is running before proceeding to the next step.
+3. **Connect your AI assistant to the running MCP Server**
+
+    [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=sbox-mcp-server&config=JTdCJTIydHlwZSUyMiUzQSUyMmh0dHAlMjIlMkMlMjJ1cmwlMjIlM0ElMjJodHRwJTNBJTJGJTJGbG9jYWxob3N0JTNBODA4MCUyMiU3RA%3D%3D)
+
+</details>
 
 ### Step 2: Install the Adapter Library in s&box
 
-Before you can interact with s&box, you must install the adapter library:
+To enable interaction with s&box, you need to install the adapter library. This library allows the MCP Server to communicate with the s&box editor.
 
 1. **Install the Adapter Library** from the [sbox-mcp-library repository](https://github.com/suiramdev/sbox-mcp-library)
+
 2. **Follow the setup instructions** in the Adapter Library repository to:
    - Install the library in your s&box project through the Asset Library
    - Connect to this MCP Server
-3. **Ensure both components are connected** before using AI assistant commands
 
 > [!IMPORTANT]
-> This MCP Server requires the separate [s&box Adapter Library](https://github.com/suiramdev/sbox-mcp-library) to communicate with the s&box editor. Please refer to the [Adapter Library documentation](https://github.com/suiramdev/sbox-mcp-library) for detailed installation and usage instructions.
+> The server must be running for the s&box adapter library to function. Please ensure the server is running before proceeding to the next step.
 
 ## Usage
 
@@ -94,22 +84,6 @@ Once both this MCP Server and the s&box Adapter Library are installed and connec
 "Show me all components attached to the Ground object"
 ```
 
-## Troubleshooting
-
-### Server Connection Issues
-
-If the MCP Server fails to start:
-
-1. **Verify .NET 9.0 SDK is installed** and accessible via command line
-2. **Check the console output** for error messages
-3. **Ensure port 8080 is available** (or configure a different port in appsettings.json)
-
-### Testing the Server
-
-You can manually test if the MCP Server is running by:
-- Using [Postman](https://www.postman.com/downloads/) or similar API clients to send WebSocket requests to `ws://localhost:8080/ws`
-- Checking the server console output for connection attempts
-
 ## Architecture
 
 This MCP Server acts as a bridge between:
@@ -120,38 +94,6 @@ The MCP Server:
 - Translates MCP tool calls into structured WebSocket commands
 - Sends commands to the s&box Adapter Library for execution
 - Returns responses back to AI assistants
-
-## Configuration
-
-The server can be configured via `appsettings.json`:
-
-```json
-{
-  "WebSocket": {
-    "Url": "http://localhost:8080",
-    "Path": "/ws"
-  }
-}
-```
-
-> **Note**: Port 8080 is the recommended WebSocket port for s&box local development.
-
-## Build Script Options
-
-The included PowerShell build script (`build.ps1`) provides comprehensive build management:
-
-| Command                   | Description                           |
-| ------------------------- | ------------------------------------- |
-| `.\build.ps1`             | Default build (Release configuration) |
-| `.\build.ps1 build`       | Build in Release mode                 |
-| `.\build.ps1 build-debug` | Build in Debug mode                   |
-| `.\build.ps1 run`         | Run the server                        |
-| `.\build.ps1 run-debug`   | Run in debug mode                     |
-| `.\build.ps1 publish`     | Create self-contained executable      |
-| `.\build.ps1 clean`       | Clean build artifacts                 |
-| `.\build.ps1 rebuild`     | Full clean rebuild                    |
-| `.\build.ps1 test`        | Run unit tests                        |
-| `.\build.ps1 help`        | Show all available options            |
 
 ## Contributing
 

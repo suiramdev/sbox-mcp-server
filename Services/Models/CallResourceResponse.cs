@@ -4,8 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace SandboxModelContextProtocol.Server.Services.Models;
 
-public class CallEditorToolResponse
+public class CallResourceResponse
 {
+	[JsonPropertyName( "type" )]
+	public string Type { get; } = "resource";
+
 	[JsonPropertyName( "id" )]
 	public required string Id { get; set; }
 

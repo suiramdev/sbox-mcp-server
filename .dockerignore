@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+README.md
+*.md
+Assets/
+
+# Build output
+bin/
+obj/
+nupkg/
+
+# IDE and Editor files
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Runtime
+*.dll.config
+*.exe.config
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# User specific files
+*.user
+*.suo
+
+# Temporary files
+*.tmp
+*.temp
