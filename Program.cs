@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using SandboxModelContextProtocol.Server.Services;
 using SandboxModelContextProtocol.Server.Services.Interfaces;
 using SandboxModelContextProtocol.Server.Services.Models;
@@ -51,6 +53,9 @@ public class Program
 
 		// Map MCP endpoints for HTTP transport
 		app.MapMcp();
+
+		// Add health check endpoint for Docker
+		app.MapGet( "/health", () => Results.Ok( new { status = "healthy", timestamp = DateTime.UtcNow } ) );
 
 		// Configure WebSocket endpoint
 		var webSocketService = app.Services.GetRequiredService<WebSocketService>();
