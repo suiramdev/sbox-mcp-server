@@ -1,10 +1,22 @@
+> [!IMPORTANT]
+> ## Project Discontinued
+>
+> Development of this library has been discontinued.
+>
+> I decided to stop maintaining this project as the MCP ecosystem for **s&box** started moving forward in a different direction. Around the same time, **Braxen** began developing their own MCP, and multiple other MCPs started to be released.
+>
+> The main issue with this library is that it required building and running an external bridge server between the coding agent and the game engine. While this approach worked, it was not easy to set up, was painful to maintain, and added unnecessary complexity for users.
+>
+> In the end, I moved toward a different solution: **[sdocs.suiram.dev](https://sdocs.suiram.dev)**, an MCP focused on providing agents with better context about the s&box documentation and API.
+>
+> This turned out to be more useful than an MCP that directly bridges with the game engine. The bigger problem was not engine communication, but the lack of reliable documentation and API context available to coding agents.
+>
+> This repository will remain available for reference, but it should be considered deprecated and is no longer actively developed.
+
 # Model Context Protocol for s&box
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![s&box](https://img.shields.io/badge/s%26box-Compatible-orange)](https://sbox.game/)
-
-> [!IMPORTANT]
-> This project is currently under active development.
 
 A Model Context Protocol (MCP) server that enables AI assistants to interact with the s&box editor through real-time WebSocket communication.
 
